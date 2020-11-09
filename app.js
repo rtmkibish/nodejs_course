@@ -1,9 +1,11 @@
-const http = require('http');
+const express = require('express');
 const { PORT, ENV } = require('./config');
 const logger = require('./logger');
 
-http.createServer((req, res) => {
-  logger.log("Hello, World");
-  res.writeHead(200, {"Content-Type": "text/plain"});
-  res.end("Hello, World\n", () => logger.log(`Response is sent at: ${(new Date).toISOString()}`))
-}).listen(PORT, () => console.log(`Listening on port: ${PORT}, works in ${ENV} mode.`));
+const app = express();
+const router = require('./routs/events');
+
+app.use(express.json());
+app.use('/events', router);
+
+app.listen(PORT);
