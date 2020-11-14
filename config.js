@@ -1,3 +1,5 @@
+const path = require('path');
+
 const PORT = process.env.PORT || 3000;
 const cliArgs = {};
 
@@ -11,4 +13,5 @@ args.forEach(arg => {
 module.exports = {
   PORT,
   ENV: cliArgs.env || 'dev',
+  EVENTSDTOPATH: path.join(__dirname, 'eventsDTO.csv'),
 }

@@ -1,0 +1,22 @@
+{
+  "name": "application",
+  "version": "1.0.0",
+  "description": "Simple calendar app",
+  "main": "app.js",
+  "scripts": {
+    "initStorage": "node ./initEventsDTO.js",
+    "start": "PORT=3300 node ./app.js -env=test -arg2=flag"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@personal:rtmkibish/nodejs_course.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "csvtojson": "^2.0.10",
+    "express": "^4.17.1",
+    "json2csv": "^5.0.3"
+  }
+}
