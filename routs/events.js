@@ -1,122 +1,123 @@
 const fs = require('fs');
 const path = require('path');
 const express = require('express');
-const csv = require('csvtojson');
-const { Parser } = require('json2csv');
-const { EVENTSDTOPATH } = require(path.join(__dirname, '..', 'config.js'));
-const { log } = require(path.join(__dirname, '..', 'logger.js'));
+const { error } = require(path.join(__dirname, '..', 'logger.js'));
+const { eventStorage } = require(path.join(__dirname, '..', 'app.js'));
 
 const router = express.Router();
 
-router.get('/', async (req, res) => {
+router.get('/', (req, res) => {
   const defaultSearchParams = ['id', 'title', 'location', 'date', 'hour'];
   const queryParams = Object.keys(req.query);
   const actualSerchParams = queryParams.filter(p => defaultSearchParams.includes(p));
-  const events = await csv().fromFile(EVENTSDTOPATH);
-  const filteredEvents = events.filter(e => {
-    for (let param of actualSerchParams) {
-      if (e[param] != req.query[param]) return false;
-    }
-    return true;
-  });
-  return res.json(filteredEvents);
+
+  const filterObject = actualSerchParams.reduce((acc, f) => {
+    acc[f] = req.query[f];
+    return acc;
+  }, {})
+
+  eventStorage.findEvents(filterObject)
+    .then(events => {
+      res.json(events);
+    })
+    .catch(reason => {
+      error(reason);
+      res.status(500).json({error: "Unable to proccess the request"});
+    })
 })
 
 router.get('/batch', async (req, res) => {
-  const readStream = fs.createReadStream(EVENTSDTOPATH);
-  readStream.pipe(csv()).pipe(res);
+  const readStream = eventStorage.batchEvents();
+  readStream.pipe(res);
 });
 
 router.get('/:eventId', (req, res) => {
   const eventId = req.params.eventId;
-  /* I know that the code belov should use await
-  but I just wanted to practice a bit with Promises
-  */
-  csv()
-    .fromFile(EVENTSDTOPATH)
-    .then(data => {
-      const event = data.find(e => e.id == eventId);
-      return res.json(event || {error: "Event is not found"});
-    })
-    .catch(reason => log(reason));
+    eventStorage.getEvent(eventId)
+      .then(event => {
+        if (event) {
+          res.json(event)
+        } else {
+          res.status(404).json({error: "Event is not found"})
+        }
+      })
+      .catch(reason => {
+        error(reason);
+        res.status(500).json(reason);
+      })
 });
 
 router.post('/', (req, res) => {
+  const rawEvent = req.body;
   const fields = ['title', 'location', 'date', 'hour'];
-  const rawEventKeys = Object.keys(req.body);
+  const rawEventKeys = Object.keys(rawEvent);
   const requiredFields = fields.filter(f => rawEventKeys.includes(f));
+  const requiredKeysNumber = 4;
 
-  if (requiredFields.length < 4) {
+  if (requiredFields.length < requiredKeysNumber) {
     return res.status(400).json({message: "One or more required fields are missed"});
   }
 
   requiredFields.unshift('id');
   const eventObj = requiredFields.reduce((acc, f) => {
-    acc[f] = req.body[f] || '';
+    acc[f] = rawEvent[f] || '';
     return acc;
   }, {});
-  eventObj.id = Date.now();
-  const options = { requiredFields, quote: '' };
-  try {
-    const parser = new Parser(options);
-    const csvEvent = parser.parse(eventObj);
-    const csvValuesOnly = csvEvent.split('\n')[1] + '\n';
-    fs.appendFile(EVENTSDTOPATH, csvValuesOnly, () => log('Event is added'));
-    return res.json(eventObj);
-  } catch (error) {
-    log(error);
-    return res.status(400).json({message: "Failed to create an event"});
-  }
+
+  eventStorage.addEvent(eventObj)
+    .then(event => res.json(event))
+    .catch(reason => {
+      error(reason);
+      res.status(500).json({error: "Unable to proccess the request"})
+    })
 });
 
 
 router.put('/:eventId', (req, res) => {
   const eventId = req.params.eventId;
-  const fields = ['title', 'location', 'date', 'hour'];
-  const rawEventKeys = Object.keys(req.body);
-  const safeForUpdateFields = fields.filter(f => rawEventKeys.includes(f));
-  const updatedEvent = safeForUpdateFields.reduce((acc, f) => {
-    acc[f] = req.body[f];
-    return acc;
-  }, {});
-
-  csv()
-    .fromFile(EVENTSDTOPATH)
-    .then(jsonEventArray => {
-      const eventIndex = jsonEventArray.findIndex(e => e.id == eventId);
-      if (eventIndex != -1) {
-        jsonEventArray[eventIndex] = {
-          ...jsonEventArray[eventIndex],
-          ...updatedEvent};
-        fields.unshift('id');
-        options = {fields, quote: ''};
-        const parser = new Parser(options);
-        const csvEvents = parser.parse(jsonEventArray) + '\n';
-        fs.writeFile(EVENTSDTOPATH, csvEvents, () => log('Event is updated'));
-        return res.json(jsonEventArray[eventIndex]);
+  
+  eventStorage.getEvent(eventId)
+    .then(event => {
+      if (!event) {
+        return res.status(404).json({error: "Event is not found"});
       }
-      return res.status(404).json({message: "Event id is not found"});
+      const fields = ['title', 'location', 'date', 'hour'];
+      const rawEventKeys = Object.keys(req.body);
+      const safeForUpdateFields = fields.filter(f => rawEventKeys.includes(f));
+      const updatedEvent = safeForUpdateFields.reduce((acc, f) => {
+        acc[f] = req.body[f];
+        return acc;
+      }, {id: eventId});
+    
+      eventStorage.updateEvent(updatedEvent)
+        .then(event => res.json(event))
+        .catch(reason => {
+          error(reason);
+          res.status(500).json({error: "Unable to proccess the request"});
+        })
     })
-    .catch(reason => log(reason));
+    .catch(reason => {
+      error(reason);
+      res.status(500).json({error: "Unable to proccess the request"});
+    })
 });
 
 router.delete('/:eventId', (req, res) => {
-  csv()
-    .fromFile(EVENTSDTOPATH)
-    .then(jsonEventArray => {
-      const eventIndex = jsonEventArray.findIndex(e => e.id == req.params.eventId);
-      if (eventIndex != -1) {
-        jsonEventArray.splice(eventIndex, 1);
-        const fields = ['id', 'title', 'location', 'date', 'hour'];
-        const options = {fields, quote: ''};
-        const parser = new Parser(options);
-        const csvEvents = parser.parse(jsonEventArray) + '\n';
-        fs.writeFile(EVENTSDTOPATH, csvEvents, () => log('Event was deleted'));
-        return res.status(204).send()
+  const eventId = req.params.eventId;
+  eventStorage.getEvent(eventId)
+    .then(event => {
+      if (!event) {
+        return res.status(404).json({error: "Event is not found"});
       }
-      return res.status(404).json({message: "Event id is not found"});
+      eventStorage.deleteEvent(event.id)
+        .then(() => {
+          res.status(204).send()
+        })
+        .catch(reason => {
+          error(reason);
+          res.status(500).json({error: "Unable to proccess the request"})
+        })
     })
-    .catch(reason => log(reason));
 });
 
 module.exports = router;

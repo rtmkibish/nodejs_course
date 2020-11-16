@@ -1,7 +1,8 @@
 ## How to run the app
-1. npm run initStorage
+1. npm install
+2. npm run initStorage
     >creates a .csv file with events
-2. npm run start
+3. npm run start
 
 ## How to verify it's working
 
