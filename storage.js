@@ -24,7 +24,6 @@ class Storage {
   }
 
   addEvent(eventObj) {
-    // const requiredFields = ['id', 'title', 'location', 'date', 'hour'];
     eventObj.id = uuid();
     const options = {
       requiredFields: this.requiredFields,
@@ -47,7 +46,6 @@ class Storage {
           ...jsonEventArray[originEventIndex],
           ...event
         };
-        // const fields = ['id', 'title', 'location', 'date', 'hour']
         const options = {
           fields: this.requiredFields,
           quote: ''
@@ -69,7 +67,6 @@ class Storage {
       .then(jsonEventArray => {
         const eventIndex = jsonEventArray.findIndex(e => e.id == id);
         jsonEventArray.splice(eventIndex, 1);
-        // const fields = ['id', 'title', 'location', 'date', 'hour'];
         const options = {
           fields: this.requiredFields,
           quote: ''
