@@ -4,7 +4,6 @@ const csv = require('csvtojson');
 const { Parser, parseAsync } = require('json2csv');
 const { v4: uuid } = require('uuid');
 const { EVENTSDTOPATH } = require(path.join(__dirname, 'config.js'));
-const { error } = require(path.join(__dirname, 'logger.js'));
 
 class Storage {
   place = EVENTSDTOPATH;
@@ -56,7 +55,6 @@ class Storage {
         return jsonEventArray[originEventIndex];
       })
       .catch(reason => {
-        error(reason)
         throw reason;
       });
   }
@@ -77,8 +75,7 @@ class Storage {
         return
       })
       .catch(reason => {
-        error(reason)
-        return reason;
+        throw reason;
       })
   }
 
@@ -95,7 +92,6 @@ class Storage {
         return filterEvents;
       })
       .catch(reason => {
-        error(reason);
         throw reason;
       })
   }
