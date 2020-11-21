@@ -1,7 +1,6 @@
-const path = require('path');
 const express = require('express');
-const { error } = require(path.join(__dirname, '..', 'logger.js'));
-const { eventStorage } = require(path.join(__dirname, '..', 'app.js'));
+const { error } = require('./../logger.js');
+const { eventStorage } = require('./../storage.js');
 
 const router = express.Router();
 

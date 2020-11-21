@@ -1,7 +1,5 @@
 const http = require('http');
-const Storage = require('./storage');
-
-const storage = new Storage();
+const storage = require('./storage');
 
 const paramsRegexp = /:[^/]+/g;
 const getRouteRegexp = route => new RegExp(`^${route}$`.replace(paramsRegexp, '([^/]+)'));

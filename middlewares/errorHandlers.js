@@ -1,5 +1,4 @@
-const { join } = require('path');
-const logger = require(join(__dirname, '..', 'logger.js'));
+const logger = require('./../logger.js');
 
 function error404(req, res, next) {
   logger.error({

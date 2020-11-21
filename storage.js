@@ -1,9 +1,8 @@
 const fs = require('fs');
-const path = require('path');
 const csv = require('csvtojson');
 const { Parser, parseAsync } = require('json2csv');
 const { v4: uuid } = require('uuid');
-const { EVENTSDTOPATH } = require(path.join(__dirname, 'config.js'));
+const { EVENTSDTOPATH } = require('./config.js');
 
 class Storage {
   place = EVENTSDTOPATH;
@@ -97,4 +96,4 @@ class Storage {
   }
 }
 
-module.exports = Storage;
+module.exports = new Storage();

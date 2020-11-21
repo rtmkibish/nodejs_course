@@ -1,45 +1,29 @@
-const { join } = require('path');
 const logger = require('pino')();
-const { asyncStorage } = require(join(__dirname, 'app.js'));
+const { asyncStorage } = require('./app.js');
 
 function info(message) {
-  if (typeof message == 'string') {
-    const state = asyncStorage.getStore().message = message;
-    logger.info(state);
-  }
-  logger.info(Object.assign(message, asyncStorage.getStore()));
+  const state = asyncStorage.getStore()
+  logger.info(Object.assign(state, message));
 }
 
 function log(message) {
-  if (typeof message == 'string') {
-    const state = asyncStorage.getStore().message = message;
-    logger.log(state);
-  }
-  logger.log(Object.assign(message, asyncStorage.getStore()));
+  const state = asyncStorage.getStore()
+  logger.log(Object.assign(state, message));
 }
 
 function debug(message) {
-  if (typeof message == 'string') {
-    const state = asyncStorage.getStore().message = message;
-    logger.debug(state);
-  }
-  logger.debug(Object.assign(message, asyncStorage.getStore()));
+  const state = asyncStorage.getStore()
+  logger.debug(Object.assign(state, message));
 } 
 
 function error(message) {
-  if (typeof message == 'string') {
-    const state = asyncStorage.getStore().message = message;
-    logger.error(state);
-  }
-  logger.error(Object.assign(message, asyncStorage.getStore()));
+  const state = asyncStorage.getStore()
+  logger.error(Object.assign(state, message));
 }
 
 function warn(message) {
-  if (typeof message == 'string') {
-    const state = asyncStorage.getStore().message = message;
-    logger.warn(state);
-  }
-  logger.warn(Object.assign(message, asyncStorage.getStore()));
+  const state = asyncStorage.getStore()
+  logger.warn(Object.assign(state, message));
 }
 
 module.exports = {
