@@ -1,8 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const { v4: uuid } = require('uuid');
-const { EVENTSDTOPATH } = require(path.join(__dirname, 'config.js'));
-const { log } = require(path.join(__dirname, 'logger.js'));
+const { EVENTSDTOPATH } = require('./config.js');
 
 const events = [
   {
@@ -41,4 +40,4 @@ function eventsToCsv(events) {
   return `${headers}\n${rawEvents.join('\n')}\n`;
 }
 
-fs.writeFile(EVENTSDTOPATH, eventsToCsv(events), () => log('The eventsDTO.csv is created'));
+fs.writeFile(EVENTSDTOPATH, eventsToCsv(events), () => console.log("The eventsDTO.csv is created"));

@@ -1,8 +1,6 @@
-const fs = require('fs');
-const path = require('path');
 const express = require('express');
-const { error } = require(path.join(__dirname, '..', 'logger.js'));
-const { eventStorage } = require(path.join(__dirname, '..', 'app.js'));
+const { error } = require('./../logger.js');
+const { eventStorage } = require('./../storage.js');
 
 const router = express.Router();
 
@@ -20,10 +18,7 @@ router.get('/', (req, res) => {
     .then(events => {
       res.json(events);
     })
-    .catch(reason => {
-      error(reason);
-      res.status(500).json({error: "Unable to proccess the request"});
-    })
+    .catch(reason => next(reason))
 })
 
 router.get('/batch', async (req, res) => {
@@ -41,13 +36,10 @@ router.get('/:eventId', (req, res) => {
           res.status(404).json({error: "Event is not found"})
         }
       })
-      .catch(reason => {
-        error(reason);
-        res.status(500).json(reason);
-      })
+      .catch(reason => next(reason))
 });
 
-router.post('/', (req, res) => {
+router.post('/', (req, res, next) => {
   const rawEvent = req.body;
   const fields = ['title', 'location', 'date', 'hour'];
   const rawEventKeys = Object.keys(rawEvent);
@@ -66,14 +58,11 @@ router.post('/', (req, res) => {
 
   eventStorage.addEvent(eventObj)
     .then(event => res.json(event))
-    .catch(reason => {
-      error(reason);
-      res.status(500).json({error: "Unable to proccess the request"})
-    })
+    .catch(reason => next(reason))
 });
 
 
-router.put('/:eventId', (req, res) => {
+router.put('/:eventId', (req, res, next) => {
   const eventId = req.params.eventId;
   
   eventStorage.getEvent(eventId)
@@ -92,14 +81,10 @@ router.put('/:eventId', (req, res) => {
       eventStorage.updateEvent(updatedEvent)
         .then(event => res.json(event))
         .catch(reason => {
-          error(reason);
-          res.status(500).json({error: "Unable to proccess the request"});
+          next(reason);
         })
     })
-    .catch(reason => {
-      error(reason);
-      res.status(500).json({error: "Unable to proccess the request"});
-    })
+    .catch(reason => next(reason))
 });
 
 router.delete('/:eventId', (req, res) => {
@@ -118,6 +103,7 @@ router.delete('/:eventId', (req, res) => {
           res.status(500).json({error: "Unable to proccess the request"})
         })
     })
+    .catch(reson => next(reason));
 });
 
 module.exports = router;

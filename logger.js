@@ -1,20 +1,33 @@
+const logger = require('pino')();
+const { asyncStorage } = require('./app.js');
+
+function info(message) {
+  const state = asyncStorage.getStore()
+  logger.info(Object.assign(state, message));
+}
+
 function log(message) {
-  console.log(message);
+  const state = asyncStorage.getStore()
+  logger.log(Object.assign(state, message));
 }
 
 function debug(message) {
-  console.debug(message);
+  const state = asyncStorage.getStore()
+  logger.debug(Object.assign(state, message));
 } 
 
 function error(message) {
-  console.error(message);
+  const state = asyncStorage.getStore()
+  logger.error(Object.assign(state, message));
 }
 
 function warn(message) {
-  console.warn(message);
+  const state = asyncStorage.getStore()
+  logger.warn(Object.assign(state, message));
 }
 
 module.exports = {
+  info,
   log,
   debug,
   error,
