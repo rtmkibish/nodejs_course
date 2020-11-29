@@ -1,6 +1,6 @@
 const express = require('express');
-const { error } = require('./../logger.js');
-const { eventStorage } = require('./../storage.js');
+const { error } = require('../logger');
+const eventStorage = require('../storages/eventStorage');
 
 const router = express.Router();
 
@@ -28,35 +28,19 @@ router.get('/batch', async (req, res) => {
 
 router.get('/:eventId', (req, res) => {
   const eventId = req.params.eventId;
-    eventStorage.getEvent(eventId)
-      .then(event => {
-        if (event) {
-          res.json(event)
-        } else {
-          res.status(404).json({error: "Event is not found"})
-        }
-      })
-      .catch(reason => next(reason))
+  eventStorage.getEvent(eventId)
+    .then(event => {
+      if (event) {
+        res.json(event)
+      } else {
+        res.status(404).json({error: "Event is not found"})
+      }
+    })
+    .catch(reason => next(reason))
 });
 
 router.post('/', (req, res, next) => {
-  const rawEvent = req.body;
-  const fields = ['title', 'location', 'date', 'hour'];
-  const rawEventKeys = Object.keys(rawEvent);
-  const requiredFields = fields.filter(f => rawEventKeys.includes(f));
-  const requiredKeysNumber = 4;
-
-  if (requiredFields.length < requiredKeysNumber) {
-    return res.status(400).json({message: "One or more required fields are missed"});
-  }
-
-  requiredFields.unshift('id');
-  const eventObj = requiredFields.reduce((acc, f) => {
-    acc[f] = rawEvent[f] || '';
-    return acc;
-  }, {});
-
-  eventStorage.addEvent(eventObj)
+  eventStorage.addEvent(req.body)
     .then(event => res.json(event))
     .catch(reason => next(reason))
 });
@@ -64,44 +48,17 @@ router.post('/', (req, res, next) => {
 
 router.put('/:eventId', (req, res, next) => {
   const eventId = req.params.eventId;
-  
-  eventStorage.getEvent(eventId)
-    .then(event => {
-      if (!event) {
-        return res.status(404).json({error: "Event is not found"});
-      }
-      const fields = ['title', 'location', 'date', 'hour'];
-      const rawEventKeys = Object.keys(req.body);
-      const safeForUpdateFields = fields.filter(f => rawEventKeys.includes(f));
-      const updatedEvent = safeForUpdateFields.reduce((acc, f) => {
-        acc[f] = req.body[f];
-        return acc;
-      }, {id: eventId});
-    
-      eventStorage.updateEvent(updatedEvent)
-        .then(event => res.json(event))
-        .catch(reason => {
-          next(reason);
-        })
-    })
+  const updatedEvent = {...req.body, id: eventId};
+  eventStorage.updateEvent(updatedEvent)
+    .then(event => res.json(event))
     .catch(reason => next(reason))
 });
 
 router.delete('/:eventId', (req, res) => {
   const eventId = req.params.eventId;
-  eventStorage.getEvent(eventId)
-    .then(event => {
-      if (!event) {
-        return res.status(404).json({error: "Event is not found"});
-      }
-      eventStorage.deleteEvent(event.id)
-        .then(() => {
-          res.status(204).send()
-        })
-        .catch(reason => {
-          error(reason);
-          res.status(500).json({error: "Unable to proccess the request"})
-        })
+  eventStorage.deleteEvent(eventId)
+    .then(() => {
+      res.status(204).send()
     })
     .catch(reson => next(reason));
 });

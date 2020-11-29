@@ -18,6 +18,7 @@ function debug(message) {
 
 function error(message) {
   const state = asyncStorage.getStore()
+  console.log('store', state, 'message', message);
   logger.error(Object.assign(state, message));
 }
 
