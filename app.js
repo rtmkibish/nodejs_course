@@ -1,14 +1,14 @@
 const express = require('express');
 const { join } = require('path');
 const { AsyncLocalStorage } = require('async_hooks');
-const { PORT, ENV } = require('./config');
+const { PORT, MONGO_ROUTE } = require('./config');
 
 const asyncStorage = new AsyncLocalStorage();
 module.exports = { asyncStorage };
 
 const mongoose = require('mongoose');
 mongoose.connect(
-  'mongodb+srv://admin:Smilewtf4@cluster0.uoyll.mongodb.net/Claster0?retryWrites=true&w=majority',
+  MONGO_ROUTE,
   { 
     useNewUrlParser: true,
     useUnifiedTopology: true,

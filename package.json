@@ -5,8 +5,8 @@
   "main": "app.js",
   "scripts": {
     "initStorage": "node ./initEventsDTO.js",
-    "start": "PORT=3300 node ./app.js -env=test -arg2=flag",
-    "startDev":"PORT=3300 nodemon ./app.js" 
+    "start": "PORT=3300 MONGO_ROUTE=mongodb+srv://admin:Smilewtf4@cluster0.uoyll.mongodb.net/Claster0?retryWrites=true&w=majority node ./app.js -env=test -arg2=flag",
+    "startDev":"PORT=3300 MONGO_ROUTE=mongodb+srv://admin:Smilewtf4@cluster0.uoyll.mongodb.net/Claster0?retryWrites=true&w=majority nodemon ./app.js" 
   },
   "repository": {
     "type": "git",

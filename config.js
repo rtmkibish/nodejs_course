@@ -12,4 +12,5 @@ module.exports = {
   PORT,
   ENV: cliArgs.env || 'dev',
   EVENTSDTOPATH: './eventsDTO.csv',
+  MONGO_ROUTE: process.env.MONGO_ROUTE
 }
