@@ -1,22 +1,3 @@
-## How to run server1.js
-1. npm install
-2. npm run initStorage
-    >creates a .csv file with events
-3. node server1.js
-
-## How to verify server1 is working
-
-### All events
-curl --location --request GET 'http://localhost:8080/events'
-
-### Events by parameters
-curl --location --request GET 'http://localhost:8080/events?location=odesa&date=22/11/2020'
-
-### Create en event
-curl --location --request POST 'http://localhost:8080/events' \
---header 'Content-Type: application/json' \
---data-raw '{"title": "node js event", "location":"dnipro", "date": "25/11/2020", "hour": "12:00"}'
-
 ## How to run the app
 1. npm install
 2. npm run initStorage

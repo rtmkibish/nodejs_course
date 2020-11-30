@@ -1,5 +1,5 @@
 const { v4: uuid } = require('uuid');
-const { asyncStorage } = require(join('./../app.js'));
+const { asyncStorage } = require('./../app.js');
 
 const requestIdMiddleware = (req, res, next) => {
   asyncStorage.run({
