@@ -12,4 +12,6 @@ module.exports = {
   PORT,
   ENV: cliArgs.env || 'dev',
   EVENTSDTOPATH: './eventsDTO.csv',
+  ACCESS_TOKEN_SECRET: process.env.ACCESS_TOKEN_SECRET,
+  REFRESH_TOKEN_SECRET: process.env.REFRESH_TOKEN_SECRET,
 }

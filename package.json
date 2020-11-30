@@ -5,8 +5,8 @@
   "main": "app.js",
   "scripts": {
     "initStorage": "node ./initEventsDTO.js",
-    "start": "PORT=3300 node ./app.js -env=test -arg2=flag",
-    "startDev":"PORT=3300 nodemon ./app.js" 
+    "start": "PORT=3300 ACCESS_TOKEN_SECRET=12 REFRESH_TOKEN_SECRET=13 node ./app.js -env=test -arg2=flag",
+    "startDev": "PORT=3300 ACCESS_TOKEN_SECRET=12 REFRESH_TOKEN_SECRET=13 nodemon ./app.js"
   },
   "repository": {
     "type": "git",
@@ -16,9 +16,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "csvtojson": "^2.0.10",
     "express": "^4.17.1",
-    "json2csv": "^5.0.3",
+    "jsonwebtoken": "^8.5.1",
     "mongoose": "^5.10.15",
     "pino": "^6.7.0",
     "uuid": "^8.3.1"
