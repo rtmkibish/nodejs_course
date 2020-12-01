@@ -30,7 +30,6 @@ router.post('/login', (req, res, next) => {
 
 router.post('/refresh', (req, res, next) => {
   const refreshToken = req.body.refresh_token;
-  const userId = req.body.userId;
   if (!refreshToken) return res.status(401).json({error: "no token provided"})
   tokenStorage.getToken(refreshToken)
     .then(token => {
@@ -60,7 +59,7 @@ router.post('/refresh', (req, res, next) => {
 })
 
 router.delete('/revoke', (req, res, next) => {
-  const token = req.body.token;
+  const token = req.body.refresh_token;
   if (!token) return res.status(400).json({error: "user id is missed"});
   tokenStorage.deleteToken(token)
     .then(info => {

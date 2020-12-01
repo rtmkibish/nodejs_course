@@ -1,31 +1,30 @@
 ## How to run the app
 1. npm install
-2. npm run initStorage
-    >creates a .csv file with events
 3. npm run start
 
-## How to verify it's working
+## How to verify that jwt auth working
 
-### Batch request
-curl --location --request GET 'http://localhost:3300/events/batch'
-
-### Events by parameters
-curl --location --request GET 'http://localhost:3300/events/?location=odesa&date=22/11/2020'
-
-curl --location --request GET 'http://localhost:3300/events/?hour=11:00'
-
-### Create en event
-curl --location --request POST 'http://localhost:3300/events/' \
+### Create token
+curl --location --request POST 'http://localhost:3300/auth/login' \
 --header 'Content-Type: application/json' \
---data-raw '{"title": "node js event", "location":"dnipro", "date": "25/11/2020", "hour": "12:00"}'
+--data-raw '{
+  "userId": "5fc3dd167059bb6065c64e55"
+}'
 
-### Get created event
-curl --location --request GET 'http://localhost:3300/events/1604952832163'
+### Check access
+curl --location --request GET 'http://localhost:3300/auth/check' \
+--header 'Authorization: Bearer acces_token here'
 
-### Update created event
-curl --location --request PUT 'http://localhost:3300/events/1604952832163' \
+### Refresh access token
+curl --location --request POST 'http://localhost:3300/auth/check' \
 --header 'Content-Type: application/json' \
---data-raw '{"title": "node js event updated", "location":"kharkiv", "date": "26/11/2020", "hour": "13:00"}'
+--data-raw '{
+  "refresh_token": "refresh_token here"
+}'
 
-### Delete created event
-curl --location --request DELETE 'http://localhost:3300/events/1604952832163'
+### Revoke refresh token
+curl --location --request DELETE 'http://localhost:3300/auth/revoke' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+    "refresh_token": "your refresh token"
+}'
